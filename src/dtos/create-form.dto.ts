@@ -49,4 +49,6 @@ export class CreateFormDto {
 
   @IsString()
   favorite_color: string;
+
+  jobId: string;
 }

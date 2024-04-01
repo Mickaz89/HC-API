@@ -18,20 +18,24 @@ export class RedisService implements OnModuleInit {
     this.client = new Redis(redisOptions);
     this.subscriber = new Redis(redisOptions);
 
-    this.subscriber.on('pmessage', (pattern, channel, message) => {
+    this.subscriber.on('pmessage', async (pattern, channel, message) => {
       const parsedMessage = JSON.parse(message);
-      console.log(parsedMessage.data);
+      const { jobId, status, url } = parsedMessage.data;
+      await this.client.set(
+        `jobId:${jobId}`,
+        JSON.stringify({ status: status, url }),
+      );
     });
 
     this.subscriber.psubscribe('document*');
   }
 
   async set(key: string, value: any): Promise<void> {
-    await this.client.set(key, JSON.stringify(value));
+    await this.client.set(key, value);
   }
 
   async get(key: string): Promise<any> {
     const data = await this.client.get(key);
-    return JSON.parse(data);
+    return data;
   }
 }
