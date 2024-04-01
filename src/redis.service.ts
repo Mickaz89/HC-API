@@ -1,16 +1,29 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
 
 @Injectable()
-export class RedisService {
-  private readonly client: Redis;
+export class RedisService implements OnModuleInit {
+  private client: Redis;
+  private subscriber: Redis;
 
-  constructor(private configService: ConfigService) {
-    this.client = new Redis({
+  constructor(private configService: ConfigService) {}
+
+  onModuleInit() {
+    const redisOptions = {
       host: this.configService.get<string>('REDIS_HOST'),
       port: this.configService.get<number>('REDIS_PORT'),
+    };
+
+    this.client = new Redis(redisOptions);
+    this.subscriber = new Redis(redisOptions);
+
+    this.subscriber.on('pmessage', (pattern, channel, message) => {
+      const parsedMessage = JSON.parse(message);
+      console.log(parsedMessage.data);
     });
+
+    this.subscriber.psubscribe('document*');
   }
 
   async set(key: string, value: any): Promise<void> {
