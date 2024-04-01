@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateFormDto } from './dtos/create-form.dto';
 import { RedisService } from './redis.service';
+import { JobStatus } from './types';
 
 @Injectable()
 export class AppService {
@@ -16,7 +16,7 @@ export class AppService {
     const jobId = uuidv4();
     await this.redisService.set(
       `jobId:${jobId}`,
-      JSON.stringify({ status: 'pending', url: null }),
+      JSON.stringify({ status: JobStatus.PENDING, url: null }),
     );
     createFormDto.jobId = jobId;
     await this.redisClient.send('generate', createFormDto).toPromise();
