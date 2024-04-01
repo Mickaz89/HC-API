@@ -8,7 +8,9 @@ $ npm install
 
 Create and fill the .env file (Look at the .env.example).
 
-Make sure that the doc-generator service is running (https://github.com/Mickaz89/HC-Doc-Generator)
+Make sure the Redis server is running on the port you specified.
+
+Make sure that the doc-generator service is running (https://github.com/Mickaz89/HC-Doc-Generator).
 
 ```bash
 # development
